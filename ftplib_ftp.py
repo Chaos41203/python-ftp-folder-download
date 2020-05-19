@@ -56,6 +56,7 @@ def addFileToQuene_upload(ftp):
             localFilePath = os.path.join(dirPath, f)
             remoteFilePath = remoteDestPath + dirPath.split(localRootPath)[-1].replace('\\','/') + '/' + f
             fileQuene.append((localFilePath, remoteFilePath))
+    print(fileQuene)
 
 #Get the object list of work directory and determine if the object is file or directory
 def listRemoteDir(ftp):
