@@ -4,6 +4,7 @@ from multiprocessing import Pool
 from datetime import datetime, timedelta
 import warnings
 import re
+import configparser
 
 ftime = datetime.now()
 
@@ -16,9 +17,9 @@ fileQuene = []
 cellPath = ''
 
 #Local root path (windows)
-localRootPath = r"C:\test\5G"
+localRootPath = r"C:\test"
 #remote root path
-remoteDestPath = r"/5G"
+remoteDestPath = r"/SBTS20A"
 
 #declare pool object
 pool = None
@@ -33,13 +34,21 @@ def init():
 
 #Login to the FTP server
 def ftpLogin():
-    host, port, usr, pwd = '60.248.106.201', 21, 'joseph', 'admin'
+    #Load FTP config and login
+    cfg = configparser.ConfigParser()
+    cfg.read('C:\\conf\\FTPConf.ini','utf-8')
+    ftp_config = cfg['FTPConf']
+    IPaddress = ftp_config['IPaddress']
+    FTP_PORT = int(ftp_config['FTP_PORT'])
+    FTP_TIMEOUT = int(ftp_config['FTP_TIMEOUT'])
+    ID = ftp_config['ID']
+    PW = ftp_config['PW']
     ftp=FTP()
     # ftp.set_debuglevel(2)     #For the debug usage
     #Connect to the FTP server
-    ftp.connect(host, port)
+    ftp.connect(IPaddress, FTP_PORT, FTP_TIMEOUT)
     #Login
-    ftp.login(usr, pwd)
+    ftp.login(ID, PW)
     #Disable passive mode
     ftp.set_pasv(False)
 
