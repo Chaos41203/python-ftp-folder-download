@@ -19,7 +19,7 @@ cellPath = ''
 #Local root path (windows)
 localRootPath = r"C:\test"
 #remote root path
-remoteDestPath = r"/SBTS20A"
+remoteDestPath = r"/SBTS19B_last_week_data"
 
 #declare pool object
 pool = None
@@ -125,7 +125,9 @@ def addFileToQuene_download(ftp, TargetDirList):
     localFullCellPath = ''
     remoteFullCellPath = ''
     counter = 0
-
+    end_folder = remoteDestPath.split('/')[-1]
+    print(end_folder)
+    mkCellDir(os.path.join(localRootPath, end_folder), end_folder)
     for obj in TargetDirList:
         counter = counter + 1
 
@@ -142,7 +144,7 @@ def addFileToQuene_download(ftp, TargetDirList):
             cellPath = os.path.join(cellPath, obj.split(':')[0])
 
             #Join the full path with download location
-            localFullCellPath = os.path.join(localRootPath, cellPath)
+            localFullCellPath = os.path.join(localRootPath, end_folder, cellPath)
 
             #Full path of FTP server file
             remoteFullCellPath = os.path.join(remoteDestPath, cellPath)
@@ -156,9 +158,9 @@ def addFileToQuene_download(ftp, TargetDirList):
             #Delete the file name from path string
             cellPath = cellPath.split(obj.split(':')[0])[0]
 
-            #If meet the last file, change the directory back(cd ..) to previous directory 
+            #If meet the last file, change the directory back(cd ..) to previous directory
             if counter == len(TargetDirList):
-                complete_Folder = cellPath.split("\\")[-2]
+                complete_Folder = localFullCellPath.split("\\")[-2]
                 cellPath = cellPath.split(complete_Folder)[0]
 
         #If the object is directory
@@ -170,7 +172,7 @@ def addFileToQuene_download(ftp, TargetDirList):
             cellPath = os.path.join(cellPath, obj.split(':')[0])
 
             #Join the full path with download location
-            localFullCellPath = os.path.join(localRootPath, cellPath)
+            localFullCellPath = os.path.join(localRootPath, end_folder, cellPath)
 
             #Full path of FTP server directory
             remoteFullCellPath = os.path.join(remoteDestPath, cellPath)
@@ -194,24 +196,22 @@ if __name__ == '__main__':
     # #Login
     ftp = ftpLogin()
 
-    addFileToQuene_upload(ftp)
+    # addFileToQuene_upload(ftp)
 
     # #Parameter init
-    # TargetDirList = []
+    TargetDirList = []
 
     # #Change directory to destination
-    # cwdToDestDir(ftp)
+    cwdToDestDir(ftp)
     
     # #Get the object list of work directory and determine if the object is file or directory
-    # TargetDirList = listRemoteDir(ftp)
+    TargetDirList = listRemoteDir(ftp)
 
-    
-    # addFileToQuene_download(ftp, TargetDirList)
-    # # print(fileQuene)
-    # p = Pool(initializer=init, processes=6)
-    # print(p.starmap(downloadObj,fileQuene))
-    # p.close()
-    # p.join()
-    # ftp.quit()
-    # etime = datetime.now() - ftime
-    # print(etime)
+    addFileToQuene_download(ftp, TargetDirList)
+    p = Pool(initializer=init, processes=6)
+    print(p.starmap(downloadObj,fileQuene))
+    p.close()
+    p.join()
+    ftp.quit()
+    etime = datetime.now() - ftime
+    print(etime)
